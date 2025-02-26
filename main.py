@@ -161,18 +161,26 @@ start_page = 1
 end_page = 50  
 
 start_time = time.time()
+print("start_time",start_time)
 # Scraping loop for main pages
+pageNum = 1
 for page in range(start_page, end_page + 1):
     url = generate_careers360_url(page)
     driver.get(url)
-    sleep(randint(5, 10))  # Allow page to load
+    sleep(randint(3, 5))  # Allow page to load
 
     main_soup = BeautifulSoup(driver.page_source, 'html.parser')
     parse_main_page(main_soup)
+    print(f"Scrapped Main Page {pageNum} Data.............")
+    pageNum+=1
 
 # Scraping loop for college detail pages
+pageNum = 1
 for college in college_list:
     parse_college_detail_page(driver, college)
+    print(f"Scrapped Colleges Data Inside the link {pageNum} Data.............")
+    pageNum+=1
+
 
 driver.quit()
 
