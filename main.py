@@ -7,9 +7,10 @@ import urllib.parse
 import pandas as pd
 from time import sleep
 from random import randint
+import time
 
 # List to store extracted data
-job_list = []
+college_list = []
 
 # Function to generate Careers360 URL
 def generate_careers360_url(page):
@@ -20,71 +21,134 @@ def generate_careers360_url(page):
         "sort_by": "3"
     }
     encoded_params = urllib.parse.urlencode(query_params, safe=",")
-    
     return f"{base_url}?{encoded_params}"
 
-print(generate_careers360_url(1))
-
-# Function to parse data from page soup
-def parse_college_data(page_soup):
-    for college in page_soup:
-        soup = BeautifulSoup(str(college), 'html.parser')
+# Function to parse data from the main page
+def parse_main_page(soup):
+    colleges = soup.find_all("div", class_="card_block")
+    for college in colleges:
+        college_soup = BeautifulSoup(str(college), 'html.parser')
 
         try:
-            college_name = soup.find("h3", class_="college_name").text.strip()
+            college_name = college_soup.find("h3", class_="college_name").text.strip()
         except AttributeError:
             college_name = "N/A"
 
         try:
-            location = soup.find("span", class_="location").text.strip()
+            location = college_soup.find("span", class_="location").text.strip()
         except AttributeError:
             location = "N/A"
-            
+
         try:
-            # Try to find the fees element and extract the text after "Fees :"
-            fees = soup.find("li", text=lambda t: "Fees :" in t if t else False).text.replace("Fees :", "").strip()
+            fees = college_soup.find("li", string=lambda s: "Fees :" in s if s else False).text.replace("Fees :", "").strip()
         except AttributeError:
             fees = "N/A"
-            
+
         try:
-            rating = soup.find("span", class_="star_text").text.strip()
+            rating = college_soup.find("span", class_="star_text").text.strip()
         except AttributeError:
             rating = "N/A"
 
         try:
-            reviews = soup.find("span", class_="review_text").text.strip()
+            reviews = college_soup.find("span", class_="review_text").text.strip()
         except AttributeError:
             reviews = "N/A"
 
         try:
-            nirf_ranking = soup.find("div", class_="ranking_strip").text.strip()
+            nirf_ranking = college_soup.find("div", class_="ranking_strip").text.strip()
         except AttributeError:
             nirf_ranking = "N/A"
-            
-        link = soup.find('a', class_='general_text')
-        if link:
-            link_text = link.get_text(strip=True)
-            link_url = link.get('href')
-            print(f'Text: {link_text}')
-            print(f'URL: {link_url}')
-        else:
-            print("No link found with class 'general_text'")
-        
-        courses = [a.text.strip() for a in soup.select("div.snippet_block ul.snippet_list li a")]
 
-        important_links = {a.text.strip(): a["href"] for a in soup.select("div.important_links ul.links_list li a")}
+        # Extract the link to the college's detail page
+        try:
+            link = college_soup.find('a', class_='general_text')['href']
+            college_url = link
+        except (AttributeError, TypeError):
+            college_url = "N/A"
 
-        # Store data in list
-        job_list.append({
+        # Store the extracted data
+        college_list.append({
             "College Name": college_name,
             "Location": location,
+            "Fees": fees,
             "Rating": rating,
             "Reviews": reviews,
             "NIRF Ranking": nirf_ranking,
-            "Courses Offered": ", ".join(courses),
-            link_text: link_url
+            "College URL": college_url
         })
 
+# Function to parse additional data from the college's detail page
+def parse_college_detail_page(driver, college):
+    print("Working.......................................")
+    if college["College URL"] == "N/A":
+        return
+
+    driver.get(college["College URL"])
+    sleep(randint(5, 10))  # Allow page to load
+
+    detail_soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+    # Extract the course title
+    try:
+        course_title = detail_soup.find('h1').text.strip()
+        college["Course Title"] = course_title
+    except AttributeError:
+        college["Course Title"] = "N/A"
+
+    # Extract the total fees
+    try:
+        total_fees = detail_soup.find('div', class_='fee').text.strip()
+        college["Total Fees"] = total_fees
+    except AttributeError:
+        college["Total Fees"] = "N/A"
+
+    # Extract the course duration
+    try:
+        course_duration = detail_soup.find('div', class_='course_detail_para').find_all('div')[1].text.strip()
+        college["Course Duration"] = course_duration
+    except (AttributeError, IndexError):
+        college["Course Duration"] = "N/A"
+
+    # Extract the eligibility criteria
+    try:
+        eligibility_criteria = detail_soup.find('div', id='eligiblity').find('div', class_='data_html_blk').text.strip()
+        college["Eligibility Criteria"] = eligibility_criteria
+    except AttributeError:
+        college["Eligibility Criteria"] = "N/A"
+
+    # Extract the important dates
+    important_dates = []
+    try:
+        dates_table = detail_soup.find('div', id='important_date').find('table', class_='table_blk')
+        for row in dates_table.find_all('tr'):
+            cols = row.find_all('td')
+            if len(cols) == 2:
+                exam_event = cols[0].text.strip()
+                date = cols[1].text.strip()
+                important_dates.append(f"{exam_event}: {date}")
+        college["Important Dates"] = "; ".join(important_dates)
+    except AttributeError:
+        college["Important Dates"] = "N/A"
+
+    # Extract the top exams accepted
+    top_exams = []
+    try:
+        exams_block = detail_soup.find('div', id='exams')
+        for exam in exams_block.find_all('h3'):
+            top_exams.append(exam.text.strip())
+        college["Top Exams Accepted"] = ", ".join(top_exams)
+    except AttributeError:
+        college["Top Exams Accepted"] = "N/A"
+
+    # Extract other popular courses in the college
+    other_courses = []
+    try:
+        courses_block = detail_soup.find('div', class_='know_more_about_college')
+        for course in courses_block.find_all('a'):
+            other_courses.append(course.text.strip())
+        college["Other Popular Courses"] = ", ".join(other_courses)
+    except AttributeError:
+        college["Other Popular Courses"] = "N/A"
 
 # Set up Selenium
 options = webdriver.ChromeOptions()
@@ -94,21 +158,30 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 
 # Define start and end pages
 start_page = 1
-page_end = 4  # Adjust as needed
+end_page = 50  
 
-# Scraping loop
-for i in range(start_page, page_end):
-    url = generate_careers360_url(i)
+start_time = time.time()
+# Scraping loop for main pages
+for page in range(start_page, end_page + 1):
+    url = generate_careers360_url(page)
     driver.get(url)
     sleep(randint(5, 10))  # Allow page to load
 
-    soup = BeautifulSoup(driver.page_source, 'html.parser')
-    page_soup = soup.find_all("div", class_="card_block")  # Adjust class to match actual structure
-    parse_college_data(page_soup)
+    main_soup = BeautifulSoup(driver.page_source, 'html.parser')
+    parse_main_page(main_soup)
+
+# Scraping loop for college detail pages
+for college in college_list:
+    parse_college_detail_page(driver, college)
 
 driver.quit()
 
 # Convert to DataFrame and save
-df = pd.DataFrame(job_list)
+df = pd.DataFrame(college_list)
 df.to_csv("careers360_colleges.csv", index=False)
 print("Data saved to careers360_colleges.csv")
+
+end_time = time.time()
+
+execution_time = end_time - start_time
+print(f"Execution time: {execution_time} seconds")
