@@ -11,17 +11,26 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from concurrent.futures import ThreadPoolExecutor
+import logging
 
-# Import HTTP wrapper
 from src.core.http import HTTP
 
-# Create output directory if not exists
-os.makedirs("output", exist_ok=True)
+# Create logs folder if it doesn't exist
+os.makedirs("logs", exist_ok=True)
 
-# List to store extracted data
+# Configure logging (log errors/warnings only to file and console)
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("logs/scraper.log"),
+        logging.StreamHandler()
+    ]
+)
+
+os.makedirs("output", exist_ok=True)
 college_list = []
 
-# Generate Careers360 URL
 def generate_careers360_url(page):
     base_url = "https://www.careers360.com/colleges/india-colleges-fctp"
     query_params = {
@@ -32,21 +41,19 @@ def generate_careers360_url(page):
     encoded_params = urllib.parse.urlencode(query_params, safe=",")
     return f"{base_url}?{encoded_params}"
 
-# Async function to fetch main page data
 async def fetch_main_page(http, page):
     url = generate_careers360_url(page)
     try:
         response = await http.get(url)
         return BeautifulSoup(response.text, "html.parser")
     except Exception as e:
-        print(f"❌ Error fetching page {page}: {e}")
-        return None  # Return None for failed requests
+        logging.error(f"Error fetching page {page}: {e}")
+        return None
 
-# Parse main page data
 def parse_main_page(soup):
     if soup is None:
         return []
-    
+
     local_colleges = []
     colleges = soup.find_all("div", class_="card_block")
 
@@ -64,10 +71,9 @@ def parse_main_page(soup):
         }
 
         local_colleges.append(college_data)
-    
+
     return local_colleges
 
-# Async function to scrape main pages with concurrency control
 async def scrape_main_pages(start_page, end_page, save_interval=5):
     global college_list
     async with httpx.AsyncClient(timeout=30) as client:
@@ -78,13 +84,11 @@ async def scrape_main_pages(start_page, end_page, save_interval=5):
 
         for i, soup in enumerate(results, start=start_page):
             college_list.extend(parse_main_page(soup))
-            print(f"✅ Scraped page {i}/{end_page}")
 
             if i % save_interval == 0 or i == end_page:
                 save_to_csv("output/careers360_colleges_partial.csv")
-                print(f"📂 Data saved after {i} pages.")
+                logging.warning(f"Partial data saved after scraping page {i}")
 
-# Function to parse additional data using Selenium
 def parse_college_detail_page(college):
     options = Options()
     options.add_argument("--headless")
@@ -112,12 +116,11 @@ def parse_college_detail_page(college):
         college["Eligibility Criteria"] = detail_soup.find('div', id='eligiblity').find('div', class_='data_html_blk').text.strip() if detail_soup.find('div', id='eligiblity') else "N/A"
 
     except Exception as e:
-        print(f"❌ Error fetching details for {college['College Name']}: {e}")
+        logging.error(f"Error fetching details for {college['College Name']}: {e}")
 
     driver.quit()
     return college
 
-# Function to scrape college details
 def scrape_college_details(save_interval=10):
     global college_list
     total_colleges = len(college_list)
@@ -125,35 +128,21 @@ def scrape_college_details(save_interval=10):
     with ThreadPoolExecutor(max_workers=6) as executor:
         for i, result in enumerate(executor.map(parse_college_detail_page, college_list)):
             college_list[i] = result
-            print(f"✅ Scraped college details {i+1}/{total_colleges}")
 
             if (i + 1) % save_interval == 0 or i + 1 == total_colleges:
                 save_to_csv("output/careers360_colleges_partial.csv")
-                print(f"📂 Data saved after {i+1} colleges.")
+                logging.warning(f"Partial data saved after scraping {i+1} college details")
 
-# Save data to CSV
 def save_to_csv(filename="output/careers360_colleges.csv"):
     df = pd.DataFrame(college_list)
     df.to_csv(filename, index=False)
 
-# Main function
-async def main():
+async def main(start_page=1, end_page=5):
     start_time = time()
-    start_page = 1
-    end_page = 5
 
-    print("🚀 Scraping main pages...")
     await scrape_main_pages(start_page, end_page)
-
-    print(f"✅ Scraped {len(college_list)} colleges from main pages.")
-
-    print("🚀 Scraping college details using multithreading...")
     scrape_college_details()
 
     save_to_csv("output/careers360_colleges.csv")
-    print(f"📂 Final data saved to output/careers360_colleges.csv")
-    print(f"⏳ Execution time: {time() - start_time:.2f} seconds")
-
-# Run the script
-if __name__ == "__main__":
-    asyncio.run(main())
+    logging.warning("Final data saved to output/careers360_colleges.csv")
+    logging.warning(f"Total execution time: {time() - start_time:.2f} seconds")
