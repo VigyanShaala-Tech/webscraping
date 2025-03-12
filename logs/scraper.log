@@ -354,3 +354,138 @@ Stacktrace:
 2025-03-11 10:32:37,575 [WARNING] Partial data saved after scraping 2500 college details
 2025-03-11 10:32:37,654 [WARNING] Final data saved to output/careers360_colleges.csv
 2025-03-11 10:32:37,658 [WARNING] Total execution time: 10499.20 seconds
+2025-03-12 07:10:42,546 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=2&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:10:42,553 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=1&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:10:44,079 [INFO] Partial data saved after scraping page 2
+2025-03-12 07:10:44,082 [INFO] ====== WebDriver manager ======
+2025-03-12 07:10:44,083 [INFO] ====== WebDriver manager ======
+2025-03-12 07:10:44,083 [INFO] ====== WebDriver manager ======
+2025-03-12 07:10:44,084 [INFO] ====== WebDriver manager ======
+2025-03-12 07:10:44,085 [INFO] ====== WebDriver manager ======
+2025-03-12 07:10:44,086 [INFO] ====== WebDriver manager ======
+2025-03-12 07:10:49,186 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,247 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,251 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,265 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,341 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,349 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,407 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,408 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,410 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,411 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,460 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,470 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,548 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,549 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,555 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,569 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,585 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:49,839 [INFO] WebDriver version 133.0.6943.141 selected
+2025-03-12 07:10:49,862 [INFO] Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:49,872 [INFO] About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,002 [INFO] WebDriver version 133.0.6943.141 selected
+2025-03-12 07:10:50,004 [INFO] WebDriver version 133.0.6943.141 selected
+2025-03-12 07:10:50,005 [INFO] WebDriver version 133.0.6943.141 selected
+2025-03-12 07:10:50,018 [INFO] Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,056 [INFO] Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,058 [INFO] WebDriver version 133.0.6943.141 selected
+2025-03-12 07:10:50,071 [INFO] Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,071 [INFO] About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,072 [INFO] About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,080 [INFO] Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,080 [INFO] About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,085 [INFO] About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,161 [INFO] Driver downloading response is 200
+2025-03-12 07:10:50,175 [INFO] Driver downloading response is 200
+2025-03-12 07:10:50,178 [INFO] Driver downloading response is 200
+2025-03-12 07:10:50,181 [INFO] Driver downloading response is 200
+2025-03-12 07:10:50,187 [INFO] Driver downloading response is 200
+2025-03-12 07:10:50,533 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:50,854 [INFO] WebDriver version 133.0.6943.141 selected
+2025-03-12 07:10:50,858 [INFO] Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:50,862 [INFO] About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/win32/chromedriver-win32.zip
+2025-03-12 07:10:51,214 [INFO] Driver downloading response is 200
+2025-03-12 07:10:54,258 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:55,032 [INFO] Driver has been saved in cache [C:\Users\Mayank Bankoti\.wdm\drivers\chromedriver\win64\133.0.6943.141]
+2025-03-12 07:10:55,380 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:55,549 [INFO] Driver has been saved in cache [C:\Users\Mayank Bankoti\.wdm\drivers\chromedriver\win64\133.0.6943.141]
+2025-03-12 07:10:56,838 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:57,520 [INFO] Driver has been saved in cache [C:\Users\Mayank Bankoti\.wdm\drivers\chromedriver\win64\133.0.6943.141]
+2025-03-12 07:10:57,975 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:58,160 [INFO] ====== WebDriver manager ======
+2025-03-12 07:10:58,271 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:58,461 [INFO] ====== WebDriver manager ======
+2025-03-12 07:10:58,636 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:10:58,925 [INFO] ====== WebDriver manager ======
+2025-03-12 07:11:08,683 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:11:08,708 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:11:08,798 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:11:08,821 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:11:08,833 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:11:08,915 [INFO] Driver [C:\Users\Mayank Bankoti\.wdm\drivers\chromedriver\win64\133.0.6943.141\chromedriver-win32/chromedriver.exe] found in cache
+2025-03-12 07:11:08,956 [INFO] Get LATEST chromedriver version for google-chrome
+2025-03-12 07:11:08,960 [INFO] Driver [C:\Users\Mayank Bankoti\.wdm\drivers\chromedriver\win64\133.0.6943.141\chromedriver-win32/chromedriver.exe] found in cache
+2025-03-12 07:11:09,081 [INFO] Driver [C:\Users\Mayank Bankoti\.wdm\drivers\chromedriver\win64\133.0.6943.141\chromedriver-win32/chromedriver.exe] found in cache
+2025-03-12 07:16:30,813 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=2&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:16:31,207 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=1&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:16:32,353 [INFO] Partial data saved after scraping page 2
+2025-03-12 07:17:29,300 [INFO] Partial data saved after scraping 10 college details
+2025-03-12 07:19:07,274 [INFO] Partial data saved after scraping 20 college details
+2025-03-12 07:19:39,414 [INFO] Partial data saved after scraping 30 college details
+2025-03-12 07:20:09,283 [INFO] Partial data saved after scraping 40 college details
+2025-03-12 07:25:40,919 [INFO] Partial data saved after scraping 50 college details
+2025-03-12 07:25:40,926 [INFO] Partial data saved after scraping 60 college details
+2025-03-12 07:25:40,934 [INFO] Partial data saved after scraping 70 college details
+2025-03-12 07:25:40,941 [INFO] Partial data saved after scraping 80 college details
+2025-03-12 07:25:40,948 [INFO] Partial data saved after scraping 90 college details
+2025-03-12 07:25:40,955 [INFO] Partial data saved after scraping 100 college details
+2025-03-12 07:25:40,962 [INFO] Final data saved to output/careers360_colleges_20250312_072540.csv
+2025-03-12 07:25:40,963 [INFO] Total execution time: 551.16 seconds
+2025-03-12 07:28:09,208 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=1&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:28:09,593 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=2&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:28:10,700 [INFO] Partial data saved after scraping page 2
+2025-03-12 07:29:05,894 [INFO] Partial data saved after scraping 10 college details
+2025-03-12 07:34:28,486 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=1&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:34:28,881 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=2&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:34:30,013 [INFO] Partial data saved after scraping page 2
+2025-03-12 07:35:27,974 [INFO] Partial data saved after scraping 10 college details
+2025-03-12 07:37:09,052 [INFO] Partial data saved after scraping 20 college details
+2025-03-12 07:37:23,213 [INFO] Partial data saved after scraping 30 college details
+2025-03-12 07:38:00,366 [ERROR] Error fetching details for Bharathiar University - Bharathiar University, Coimbatore: Message: tab crashed
+  (Session info: chrome=133.0.6943.143)
+Stacktrace:
+	GetHandleVerifier [0x00260B43+25139]
+	(No symbol) [0x001F13F4]
+	(No symbol) [0x000D0340]
+	(No symbol) [0x000C2193]
+	(No symbol) [0x000C15F7]
+	(No symbol) [0x000C1193]
+	(No symbol) [0x000C0EA1]
+	(No symbol) [0x000BED80]
+	(No symbol) [0x000BF92D]
+	(No symbol) [0x000CC406]
+	(No symbol) [0x000DD2B5]
+	(No symbol) [0x000E2BA6]
+	(No symbol) [0x000BFF3D]
+	(No symbol) [0x000DCE65]
+	(No symbol) [0x0015EA66]
+	(No symbol) [0x0013CDC6]
+	(No symbol) [0x0010BDE9]
+	(No symbol) [0x0010D124]
+	GetHandleVerifier [0x00564373+3185251]
+	GetHandleVerifier [0x0058291A+3309578]
+	GetHandleVerifier [0x0057CF42+3286578]
+	GetHandleVerifier [0x002F7AE0+643536]
+	(No symbol) [0x001FA20D]
+	(No symbol) [0x001F70B8]
+	(No symbol) [0x001F7257]
+	(No symbol) [0x001E9E00]
+	BaseThreadInitThunk [0x7700FCC9+25]
+	RtlGetAppContainerNamedObjectPath [0x77BF82AE+286]
+	RtlGetAppContainerNamedObjectPath [0x77BF827E+238]
+	(No symbol) [0x00000000]
+
+2025-03-12 07:44:07,813 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=2&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:44:08,195 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=1&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:44:09,343 [INFO] Partial data saved after scraping page 2
+2025-03-12 07:45:08,123 [INFO] Partial data saved after scraping 10 college details
