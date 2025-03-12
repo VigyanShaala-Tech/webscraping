@@ -43,7 +43,7 @@ def generate_careers360_url(page):
     base_url = "https://www.careers360.com/colleges/india-colleges-fctp"
     query_params = {
         "page": page,
-        "degree": "64,2,72,14,6,65,100,101,150,75,168,9,211",
+        "degree": "72,14,6,101,150,168,9,184,76,154,215,191,73",
         "sort_by": "3"
     }
     encoded_params = urllib.parse.urlencode(query_params, safe=",")

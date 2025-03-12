@@ -489,3 +489,107 @@ Stacktrace:
 2025-03-12 07:44:08,195 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=1&degree=64,2,72,14,6,65,100,101,150,75,168,9,211&sort_by=3 "HTTP/1.1 200 OK"
 2025-03-12 07:44:09,343 [INFO] Partial data saved after scraping page 2
 2025-03-12 07:45:08,123 [INFO] Partial data saved after scraping 10 college details
+2025-03-12 07:51:04,939 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=2&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:51:05,304 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=1&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:51:06,443 [INFO] Partial data saved after scraping page 2
+2025-03-12 07:52:04,935 [INFO] Partial data saved after scraping 10 college details
+2025-03-12 07:56:32,508 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=2&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:32,906 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=1&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:34,352 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=6&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:34,780 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=5&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:35,187 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=7&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:35,526 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=4&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:35,528 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=3&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:37,644 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=8&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:37,662 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=10&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:38,236 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=9&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:39,535 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=12&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:39,565 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=11&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:40,512 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=15&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:41,097 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=13&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:41,851 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=14&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:42,647 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=17&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:42,681 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=18&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:43,673 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=16&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:44,205 [INFO] HTTP Request: GET https://www.careers360.com/colleges/india-colleges-fctp?page=19&degree=72,14,6,101,150,168,9,184,76,154,215,191,73&sort_by=3 "HTTP/1.1 200 OK"
+2025-03-12 07:56:49,429 [INFO] Partial data saved after scraping page 5
+2025-03-12 07:56:51,240 [INFO] Partial data saved after scraping page 10
+2025-03-12 07:56:53,000 [INFO] Partial data saved after scraping page 15
+2025-03-12 07:56:54,353 [INFO] Partial data saved after scraping page 19
+2025-03-12 07:57:57,617 [INFO] Partial data saved after scraping 10 college details
+2025-03-12 07:59:49,916 [INFO] Partial data saved after scraping 20 college details
+2025-03-12 08:01:16,424 [INFO] Partial data saved after scraping 30 college details
+2025-03-12 08:01:16,518 [INFO] Partial data saved after scraping 40 college details
+2025-03-12 08:02:21,522 [INFO] Partial data saved after scraping 50 college details
+2025-03-12 08:02:43,928 [INFO] Partial data saved after scraping 60 college details
+2025-03-12 08:03:33,240 [INFO] Partial data saved after scraping 70 college details
+2025-03-12 08:06:00,871 [INFO] Partial data saved after scraping 80 college details
+2025-03-12 08:06:00,938 [INFO] Partial data saved after scraping 90 college details
+2025-03-12 08:06:01,011 [INFO] Partial data saved after scraping 100 college details
+2025-03-12 08:07:29,603 [INFO] Partial data saved after scraping 110 college details
+2025-03-12 08:07:34,916 [INFO] Partial data saved after scraping 120 college details
+2025-03-12 08:09:39,269 [INFO] Partial data saved after scraping 130 college details
+2025-03-12 08:09:39,317 [INFO] Partial data saved after scraping 140 college details
+2025-03-12 08:10:27,012 [INFO] Partial data saved after scraping 150 college details
+2025-03-12 08:10:53,655 [INFO] Partial data saved after scraping 160 college details
+2025-03-12 08:13:54,106 [INFO] Partial data saved after scraping 170 college details
+2025-03-12 08:13:54,301 [INFO] Partial data saved after scraping 180 college details
+2025-03-12 08:13:54,654 [INFO] Partial data saved after scraping 190 college details
+2025-03-12 08:15:04,275 [INFO] Partial data saved after scraping 200 college details
+2025-03-12 08:15:26,757 [INFO] Partial data saved after scraping 210 college details
+2025-03-12 08:15:54,370 [INFO] Partial data saved after scraping 220 college details
+2025-03-12 08:23:17,941 [INFO] Partial data saved after scraping 230 college details
+2025-03-12 08:23:18,027 [INFO] Partial data saved after scraping 240 college details
+2025-03-12 08:23:18,106 [INFO] Partial data saved after scraping 250 college details
+2025-03-12 08:23:18,218 [INFO] Partial data saved after scraping 260 college details
+2025-03-12 08:23:18,287 [INFO] Partial data saved after scraping 270 college details
+2025-03-12 08:23:18,349 [INFO] Partial data saved after scraping 280 college details
+2025-03-12 08:23:18,451 [INFO] Partial data saved after scraping 290 college details
+2025-03-12 08:23:18,518 [INFO] Partial data saved after scraping 300 college details
+2025-03-12 08:23:22,592 [INFO] Partial data saved after scraping 310 college details
+2025-03-12 08:25:14,084 [INFO] Partial data saved after scraping 320 college details
+2025-03-12 08:25:14,177 [INFO] Partial data saved after scraping 330 college details
+2025-03-12 08:26:59,848 [ERROR] Error fetching details for Agra Public Pharmacy College, Agra: Message: timeout: Timed out receiving message from renderer: -0.050
+  (Session info: chrome=133.0.6943.143)
+Stacktrace:
+	GetHandleVerifier [0x01200B43+25139]
+	(No symbol) [0x011913F4]
+	(No symbol) [0x010704E3]
+	(No symbol) [0x0106116B]
+	(No symbol) [0x01060EA1]
+	(No symbol) [0x0105ED80]
+	(No symbol) [0x0105F92D]
+	(No symbol) [0x0106BDF9]
+	(No symbol) [0x0107D2B5]
+	(No symbol) [0x01082BA6]
+	(No symbol) [0x0105FF3D]
+	(No symbol) [0x0107D07E]
+	(No symbol) [0x010FE687]
+	(No symbol) [0x010DCDC6]
+	(No symbol) [0x010ABDE9]
+	(No symbol) [0x010AD124]
+	GetHandleVerifier [0x01504373+3185251]
+	GetHandleVerifier [0x0152291A+3309578]
+	GetHandleVerifier [0x0151CF42+3286578]
+	GetHandleVerifier [0x01297AE0+643536]
+	(No symbol) [0x0119A20D]
+	(No symbol) [0x011970B8]
+	(No symbol) [0x01197257]
+	(No symbol) [0x01189E00]
+	BaseThreadInitThunk [0x7700FCC9+25]
+	RtlGetAppContainerNamedObjectPath [0x77BF82AE+286]
+	RtlGetAppContainerNamedObjectPath [0x77BF827E+238]
+
+2025-03-12 08:27:06,021 [INFO] Partial data saved after scraping 340 college details
+2025-03-12 08:27:06,126 [INFO] Partial data saved after scraping 350 college details
+2025-03-12 08:31:56,126 [INFO] Partial data saved after scraping 360 college details
+2025-03-12 08:31:56,255 [INFO] Partial data saved after scraping 370 college details
+2025-03-12 08:31:56,355 [INFO] Partial data saved after scraping 380 college details
+2025-03-12 08:31:56,474 [INFO] Partial data saved after scraping 390 college details
+2025-03-12 08:31:56,648 [INFO] Partial data saved after scraping 400 college details
+2025-03-12 08:31:56,765 [INFO] Partial data saved after scraping 410 college details
+2025-03-12 08:34:16,578 [INFO] Partial data saved after scraping 420 college details
+2025-03-12 08:34:16,661 [INFO] Partial data saved after scraping 430 college details
+2025-03-12 08:34:45,246 [INFO] Partial data saved after scraping 440 college details
+2025-03-12 08:35:15,533 [INFO] Partial data saved after scraping 450 college details
+2025-03-12 08:36:11,647 [INFO] Partial data saved after scraping 460 college details
