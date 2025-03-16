@@ -1,0 +1,32 @@
+2025-03-16 14:54:17,574 [INFO] Login successful.
+2025-03-16 14:54:18,570 [INFO] Fetched and saved 50 records from start=0
+2025-03-16 14:54:19,653 [INFO] Fetched and saved 50 records from start=50
+2025-03-16 14:54:20,602 [INFO] Fetched and saved 50 records from start=100
+2025-03-16 14:54:21,529 [INFO] Fetched and saved 50 records from start=150
+2025-03-16 14:54:22,464 [INFO] Fetched and saved 50 records from start=200
+2025-03-16 14:54:23,404 [INFO] Fetched and saved 50 records from start=250
+2025-03-16 14:54:24,405 [INFO] Fetched and saved 50 records from start=300
+2025-03-16 14:54:25,664 [INFO] Fetched and saved 50 records from start=350
+2025-03-16 14:54:26,832 [INFO] Fetched and saved 50 records from start=400
+2025-03-16 14:54:28,058 [INFO] Fetched and saved 50 records from start=450
+2025-03-16 14:54:29,209 [INFO] Fetched and saved 50 records from start=500
+2025-03-16 14:54:30,268 [INFO] Fetched and saved 50 records from start=550
+2025-03-16 14:54:31,271 [INFO] Fetched and saved 50 records from start=600
+2025-03-16 14:54:32,219 [INFO] Fetched and saved 50 records from start=650
+2025-03-16 14:54:33,179 [INFO] Fetched and saved 50 records from start=700
+2025-03-16 14:54:34,143 [INFO] Fetched and saved 50 records from start=750
+2025-03-16 14:54:35,178 [INFO] Fetched and saved 50 records from start=800
+2025-03-16 14:54:36,189 [INFO] Fetched and saved 50 records from start=850
+2025-03-16 14:54:37,218 [INFO] Fetched and saved 50 records from start=900
+2025-03-16 14:54:38,164 [INFO] Fetched and saved 50 records from start=950
+2025-03-16 14:54:39,106 [INFO] Fetched and saved 50 records from start=1000
+2025-03-16 14:54:40,094 [INFO] Fetched and saved 50 records from start=1050
+2025-03-16 14:54:41,075 [INFO] Fetched and saved 50 records from start=1100
+2025-03-16 14:54:42,074 [INFO] Fetched and saved 50 records from start=1150
+2025-03-16 14:54:43,107 [INFO] Fetched and saved 50 records from start=1200
+2025-03-16 14:54:44,095 [INFO] Fetched and saved 50 records from start=1250
+2025-03-16 14:54:45,063 [INFO] Fetched and saved 50 records from start=1300
+2025-03-16 14:54:46,039 [INFO] Fetched and saved 50 records from start=1350
+2025-03-16 14:54:46,708 [INFO] Fetched and saved 33 records from start=1400
+2025-03-16 14:54:46,824 [INFO] No more data found. Scraping complete.
+2025-03-16 14:54:46,825 [INFO] All data saved to output/assignment_submissions_20250316_145417.csv
