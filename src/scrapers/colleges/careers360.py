@@ -18,7 +18,7 @@ from src.core.http import HTTP
 
 # Create folders for logs and output files
 os.makedirs("logs", exist_ok=True)
-os.makedirs("output", exist_ok=True)
+os.makedirs("output/colleges/career360", exist_ok=True)
 
 # Configure logging to output info-level messages
 logging.basicConfig(
@@ -37,7 +37,7 @@ logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 college_list = []
 # Global partial filename (will be set at start time in main)
-PARTIAL_FILENAME = "output/careers360_colleges_partial.csv"
+PARTIAL_FILENAME = "output/colleges/career360/careers360_colleges_partial.csv"
 
 def generate_careers360_url(page):
     base_url = "https://www.careers360.com/colleges/india-colleges-fctp"
@@ -51,7 +51,7 @@ def generate_careers360_url(page):
 
 def generate_timestamped_filename(prefix="careers360_colleges"):
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"output/{prefix}_{now}.csv"
+    return f"career360/{prefix}_{now}.csv"
 
 async def fetch_main_page(http, page):
     url = generate_careers360_url(page)
@@ -209,7 +209,7 @@ async def main(start_page=1, end_page=5):
     start_time = time()
     # Compute a start timestamp that remains fixed for all partial saves
     start_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    PARTIAL_FILENAME = f"output/careers360_colleges_partial_{start_timestamp}.csv"
+    PARTIAL_FILENAME = f"output/colleges/career360/careers360_colleges_partial_{start_timestamp}.csv"
 
     await scrape_main_pages(start_page, end_page)
     scrape_college_details()
