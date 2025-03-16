@@ -1,4 +1,8 @@
-src/scrapers/colleges/__pycache__/careers360.cpython-313.pyc
-/src/core/__pycache__
-/src/scrapers/colleges/__pycache__
-/logs
+# Ignore all __pycache__ directories anywhere
+__pycache__/
+
+# Ignore all .pyc files anywhere
+*.pyc
+
+# Ignore logs directory at project root
+/logs/
