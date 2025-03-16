@@ -3,7 +3,7 @@ from src.scrapers.colleges import careers360
 from src.scrapers.graphy.assignments import GraphyAssignmentScraper
 import logging
 
-scraper = 1 
+scraper = 2
 
 if __name__ == "__main__":
     if scraper == 1 :
@@ -11,8 +11,8 @@ if __name__ == "__main__":
         end_page = int(input("Enter end page: ").strip())
         asyncio.run(careers360.main(start_page=start_page, end_page=end_page))
     else:
-        email = "muskan.gupta@vigyanshaala.com"
-        password = "VS@123"
+        email = input("Enter Email Address: ").strip()
+        password = input("Enter Password: ").strip()
         assignment_id = "65c5f301e4b051b50cfd6121"
 
         try:
