@@ -85,17 +85,16 @@ def parse_main_page(soup):
 
     return local_colleges
 
-async def scrape_main_pages(start_page, end_page, save_interval=5):
+async def scrape_main_pages(start_page, end_page, save_interval=5, max_concurrency=5):
     global college_list
     async with httpx.AsyncClient(timeout=30) as client:
-        http = HTTP(client, max_concurrency=5)
+        http = HTTP(client, max_concurrency=max_concurrency)
 
         tasks = [fetch_main_page(http, page) for page in range(start_page, end_page + 1)]
         results = await asyncio.gather(*tasks)
 
         for i, soup in enumerate(results, start=start_page):
             college_list.extend(parse_main_page(soup))
-
             if i % save_interval == 0 or i == end_page:
                 save_to_csv(PARTIAL_FILENAME)
                 logging.info(f"Partial data saved after scraping page {i}")
@@ -204,20 +203,20 @@ def save_to_csv(filename):
     df = pd.DataFrame(college_list)
     df.to_csv(filename, index=False)
 
-async def main(start_page=1, end_page=5):
+async def main(start_page=1, end_page=5, max_concurrency=5):
     global PARTIAL_FILENAME
     start_time = time()
-    # Compute a start timestamp that remains fixed for all partial saves
     start_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     PARTIAL_FILENAME = f"output/colleges/career360/careers360_colleges_partial_{start_timestamp}.csv"
 
-    await scrape_main_pages(start_page, end_page)
+    await scrape_main_pages(start_page, end_page, max_concurrency=max_concurrency)
     scrape_college_details()
 
     final_filename = generate_timestamped_filename()
     save_to_csv(final_filename)
     logging.info(f"Final data saved to {final_filename}")
     logging.info(f"Total execution time: {time() - start_time:.2f} seconds")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
