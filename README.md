@@ -19,11 +19,3 @@ This project contains Python-based web scrapers for extracting data from:
 |Laptop                       |Ryzen 3 3250U, 2+4, 2.6GHz       |6GB DDR4 @ 2400 MHz                                 |none (integrated Vega 3)|
 |Raspi 5                      |ARM Cortex A-76, 4+0, 2.4GHz     |8GB DDR4 @ 4267 MHz                                 |VideoCore VII, -, 800MHz|
 |Github Actions*              |AMD EPYC 7763, 4, 2.2GHz         |16GB DDR4 @ unknown                                 |none                    |
-
-
-|Device                       |Pytesseract (Single-threaded)|EasyOCR (Single-threaded)                           |Pytesseract (Multithreaded)|EasyOCR (Multithreaded)|
-|-----------------------------|-----------------------------|----------------------------------------------------|---------------------------|-----------------------|
-|PC                           |143.14                       |804.62                                              |41                         |564.27                 |
-|Laptop                       |933.23                       |1749.2                                              |788.3                      |1592.45                |
-|Raspi 5                      |619.41                       |1508.53                                             |461.13                     |1228                   |
-|Github Actions               |300                          |1486.82                                             |Process Timeout            |1180.09                |
