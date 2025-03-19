@@ -16,28 +16,49 @@ import logging
 
 from src.core.http import HTTP
 
-# Create folders for logs and output files
-os.makedirs("logs", exist_ok=True)
-os.makedirs("output", exist_ok=True)
+# Async HTTP client timeout (in seconds). Prevents long hangs.
+HTTP_TIMEOUT = 30
 
-# Configure logging to output info-level messages
+# Maximum concurrent requests via AsyncClient
+MAX_CONCURRENCY = 5 
+
+# Save partial CSVs after every N pages / N colleges
+MAIN_SAVE_INTERVAL = 5
+DETAIL_SAVE_INTERVAL = 10
+
+# Selenium WebDriver settings
+HEADLESS_MODE = True  # Headless mode avoids opening Chrome GUI
+PAGE_LOAD_TIMEOUT = 30  # Timeout for college detail page loading
+
+# Sleep range between detail page fetches
+DETAIL_PAGE_SLEEP_MIN = 3
+DETAIL_PAGE_SLEEP_MAX = 5
+
+# Threads for scraping college detail pages
+DETAIL_SCRAPER_THREADS = 4
+
+# Paths
+PARTIAL_DIR = "output/colleges/career360"
+LOG_FILE = "logs/scraper.log"
+PARTIAL_FILENAME = f"{PARTIAL_DIR}/careers360_colleges_partial.csv"
+
+os.makedirs("logs", exist_ok=True)
+os.makedirs(PARTIAL_DIR, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("logs/scraper.log"),
+        logging.FileHandler(LOG_FILE),
         logging.StreamHandler()
     ]
 )
 
-# Adjust external libraries' log levels to reduce verbosity
 logging.getLogger("WDM").setLevel(logging.ERROR)
 logging.getLogger("selenium").setLevel(logging.ERROR)
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 college_list = []
-# Global partial filename (will be set at start time in main)
-PARTIAL_FILENAME = "output/careers360_colleges_partial.csv"
 
 def generate_careers360_url(page):
     base_url = "https://www.careers360.com/colleges/india-colleges-fctp"
@@ -51,7 +72,7 @@ def generate_careers360_url(page):
 
 def generate_timestamped_filename(prefix="careers360_colleges"):
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"output/{prefix}_{now}.csv"
+    return f"{PARTIAL_DIR}/{prefix}_{now}.csv"
 
 async def fetch_main_page(http, page):
     url = generate_careers360_url(page)
@@ -85,24 +106,24 @@ def parse_main_page(soup):
 
     return local_colleges
 
-async def scrape_main_pages(start_page, end_page, save_interval=5):
+async def scrape_main_pages(start_page, end_page, save_interval=MAIN_SAVE_INTERVAL, max_concurrency=MAX_CONCURRENCY):
     global college_list
-    async with httpx.AsyncClient(timeout=30) as client:
-        http = HTTP(client, max_concurrency=5)
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+        http = HTTP(client, max_concurrency=max_concurrency)
 
         tasks = [fetch_main_page(http, page) for page in range(start_page, end_page + 1)]
         results = await asyncio.gather(*tasks)
 
         for i, soup in enumerate(results, start=start_page):
             college_list.extend(parse_main_page(soup))
-
             if i % save_interval == 0 or i == end_page:
                 save_to_csv(PARTIAL_FILENAME)
                 logging.info(f"Partial data saved after scraping page {i}")
 
 def parse_college_detail_page(college):
     options = Options()
-    options.add_argument("--headless")
+    if HEADLESS_MODE:
+        options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -115,21 +136,20 @@ def parse_college_detail_page(college):
         return college
 
     try:
-        driver.set_page_load_timeout(30)
+        driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
         driver.get(college["College URL"])
-        sleep(random.uniform(3, 5))
+        sleep(random.uniform(DETAIL_PAGE_SLEEP_MIN, DETAIL_PAGE_SLEEP_MAX))
 
         detail_soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        # Course Title
+        # Course Details
         title_tag = detail_soup.find("h1")
         college["Course Title"] = title_tag.text.strip() if title_tag else "N/A"
 
-        # Total Fees (main section)
         fee_tag = detail_soup.find("div", class_="fee")
         college["Total Fees"] = fee_tag.text.strip() if fee_tag else "N/A"
 
-        # Course Duration and Mode
+        # Course Duration & Mode
         course_detail_divs = detail_soup.select(".course_detail_para div")
         for div in course_detail_divs:
             label = div.find("p")
@@ -156,7 +176,7 @@ def parse_college_detail_page(college):
         else:
             college["Eligibility Criteria"] = "N/A"
 
-        # Selection Process (Admission Details)
+        # Selection Process / Admission
         admission_tag = detail_soup.find("div", id="admission_detail")
         if admission_tag:
             selection_para = admission_tag.find("div", class_="data_html_blk")
@@ -164,7 +184,7 @@ def parse_college_detail_page(college):
         else:
             college["Selection Process"] = "N/A"
 
-        # Quick Facts block
+        # Quick Facts Table
         quick_facts = detail_soup.select(".quick_facts_table td")
         for td in quick_facts:
             label_tag = td.select_one(".right_upr")
@@ -188,14 +208,13 @@ def parse_college_detail_page(college):
     driver.quit()
     return college
 
-def scrape_college_details(save_interval=10):
+def scrape_college_details(save_interval=DETAIL_SAVE_INTERVAL):
     global college_list
     total_colleges = len(college_list)
 
-    with ThreadPoolExecutor(max_workers=6) as executor:
+    with ThreadPoolExecutor(max_workers=DETAIL_SCRAPER_THREADS) as executor:
         for i, result in enumerate(executor.map(parse_college_detail_page, college_list)):
             college_list[i] = result
-
             if (i + 1) % save_interval == 0 or i + 1 == total_colleges:
                 save_to_csv(PARTIAL_FILENAME)
                 logging.info(f"Partial data saved after scraping {i+1} college details")
@@ -204,14 +223,13 @@ def save_to_csv(filename):
     df = pd.DataFrame(college_list)
     df.to_csv(filename, index=False)
 
-async def main(start_page=1, end_page=5):
+async def main(start_page=1, end_page=5, max_concurrency=MAX_CONCURRENCY):
     global PARTIAL_FILENAME
     start_time = time()
-    # Compute a start timestamp that remains fixed for all partial saves
     start_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    PARTIAL_FILENAME = f"output/careers360_colleges_partial_{start_timestamp}.csv"
+    PARTIAL_FILENAME = f"{PARTIAL_DIR}/careers360_colleges_partial_{start_timestamp}.csv"
 
-    await scrape_main_pages(start_page, end_page)
+    await scrape_main_pages(start_page, end_page, max_concurrency=max_concurrency)
     scrape_college_details()
 
     final_filename = generate_timestamped_filename()
