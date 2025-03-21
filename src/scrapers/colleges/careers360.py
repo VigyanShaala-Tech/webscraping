@@ -252,19 +252,35 @@ def parse_college_detail_page(college):
     return course_data_list
 
 def scrape_college_details(save_interval=DETAIL_SAVE_INTERVAL):
-    global college_list
+    global detailed_course_list
     total_colleges = len(college_list)
 
     with ThreadPoolExecutor(max_workers=DETAIL_SCRAPER_THREADS) as executor:
         for i, result in enumerate(executor.map(parse_college_detail_page, college_list)):
-            college_list[i] = result
-            if (i + 1) % save_interval == 0 or i + 1 == total_colleges:
+            # Handle cases where multiple courses are returned per college
+            if isinstance(result, list):
+                detailed_course_list.extend(result)
+            elif isinstance(result, dict):
+                detailed_course_list.append(result)
+            else:
+                logging.warning(f"Unexpected result format at index {i}: {type(result)}")
+
+            # Save partial results after every `save_interval` colleges
+            if (i + 1) % save_interval == 0 or (i + 1) == total_colleges:
                 save_to_csv(PARTIAL_FILENAME)
-                logging.info(f"Partial data saved after scraping {i+1} college details")
+                logging.info(f"Partial data saved after scraping {i+1} colleges")
+
+# Global list to hold all flattened course data
+detailed_course_list = []
 
 def save_to_csv(filename):
-    df = pd.DataFrame(college_list)
-    df.to_csv(filename, index=False)
+    try:
+        df = pd.DataFrame(detailed_course_list)
+        df.to_csv(filename, index=False)
+        logging.info(f"Data saved to {filename}")
+    except Exception as e:
+        logging.error(f"Error saving CSV: {e}")
+
 
 async def main(start_page=1, end_page=5, max_concurrency=MAX_CONCURRENCY):
     global PARTIAL_FILENAME
