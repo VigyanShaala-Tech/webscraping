@@ -130,6 +130,7 @@ async def scrape_main_pages(start_page, end_page, save_interval=MAIN_SAVE_INTERV
             if i % save_interval == 0 or i == end_page:
                 save_to_csv(PARTIAL_FILENAME)
                 logging.info(f"Partial data saved after scraping page {i}")
+
 def parse_college_detail_page(college):
     options = Options()
     if HEADLESS_MODE:
@@ -147,47 +148,51 @@ def parse_college_detail_page(college):
 
     course_data_list = []
     try:
-        # STEP 1: Open the main /courses page for the college
         base_url = college["College URL"]
         courses_url = generate_course_url(base_url)
-        # courses_url = base_url + "/courses"
-        # if not courses_url.startswith("http"):
-        #     courses_url = f"https://www.careers360.com{courses_url}"
 
         driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
         driver.get(courses_url)
         sleep(random.uniform(DETAIL_PAGE_SLEEP_MIN, DETAIL_PAGE_SLEEP_MAX))
 
-        main_soup = BeautifulSoup(driver.page_source, "html.parser")
+        course_links = set()
 
-        # STEP 2: Extract all course block links
-        course_blocks = main_soup.find_all("div", class_="detail")
-        course_links = []
-        for block in course_blocks:
-            link_tag = block.find("h4").find("a")
-            if link_tag and link_tag.get("href"):
-                course_links.append(link_tag["href"])
+        # ------------------------
+        # PAGINATION LOOP - COLLECT COURSE LINKS FROM EACH PAGE
+        while True:
+            main_soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        # STEP 3: Now loop through each course link and scrape course-specific data
+            course_blocks = main_soup.find_all("div", class_="detail")
+            for block in course_blocks:
+                link_tag = block.find("h4").find("a")
+                if link_tag and link_tag.get("href"):
+                    course_links.add(link_tag["href"])
+
+            # Check for NEXT button
+            next_btn = main_soup.find("a", class_="pagination_list_last")
+            if next_btn and next_btn.get("href"):
+                next_url = next_btn["href"]
+                driver.get(next_url)
+                sleep(random.uniform(DETAIL_PAGE_SLEEP_MIN, DETAIL_PAGE_SLEEP_MAX))
+                print("going to next page",next_url)
+            else:
+                break
+        # ------------------------
+
+        # Now loop through all collected course links
         for course_link in course_links:
-            course = college.copy()  # base college info
+            course = college.copy()
 
-            # Open course detail page
             full_url = course_link if course_link.startswith("http") else f"https://www.careers360.com{course_link}"
             print("Opening:", full_url)
             driver.get(full_url)
             sleep(random.uniform(DETAIL_PAGE_SLEEP_MIN, DETAIL_PAGE_SLEEP_MAX))
             detail_soup = BeautifulSoup(driver.page_source, "html.parser")
 
-            # Course Title
-            title_tag = detail_soup.find("h1")
-            course["Course Title"] = title_tag.text.strip() if title_tag else "N/A"
-
-            # Total Fees
+            course["Course Title"] = detail_soup.find("h1").text.strip() if detail_soup.find("h1") else "N/A"
             fee_tag = detail_soup.find("div", class_="fee")
             course["Total Fees"] = fee_tag.text.strip() if fee_tag else "N/A"
 
-            # Course Duration and Mode
             course_detail_divs = detail_soup.select(".course_detail_para div")
             for div in course_detail_divs:
                 label = div.find("p")
@@ -202,11 +207,9 @@ def parse_college_detail_page(college):
             course.setdefault("Course Duration", "N/A")
             course.setdefault("Course Mode", "N/A")
 
-            # Description
             desc_tag = detail_soup.select_one(".list_tick_style p")
             course["Course Description"] = desc_tag.text.strip() if desc_tag else "N/A"
 
-            # Eligibility
             eligibility_tag = detail_soup.find("div", id="eligiblity")
             if eligibility_tag:
                 criteria_tag = eligibility_tag.find("div", class_="data_html_blk")
@@ -214,7 +217,6 @@ def parse_college_detail_page(college):
             else:
                 course["Eligibility Criteria"] = "N/A"
 
-            # Admission Process
             admission_tag = detail_soup.find("div", id="admission_detail")
             if admission_tag:
                 selection_para = admission_tag.find("div", class_="data_html_blk")
@@ -222,7 +224,6 @@ def parse_college_detail_page(college):
             else:
                 course["Selection Process"] = "N/A"
 
-            # Quick Facts Table
             quick_facts = detail_soup.select(".quick_facts_table td")
             for td in quick_facts:
                 label_tag = td.select_one(".right_upr")
@@ -240,7 +241,6 @@ def parse_college_detail_page(college):
             course.setdefault("Entrance Exam", "N/A")
             course.setdefault("Total Seats", "N/A")
 
-            # Append this course's data
             course_data_list.append(course)
 
     except Exception as e:
@@ -250,6 +250,8 @@ def parse_college_detail_page(college):
         driver.quit()
 
     return course_data_list
+
+
 
 def scrape_college_details(save_interval=DETAIL_SAVE_INTERVAL):
     global detailed_course_list
