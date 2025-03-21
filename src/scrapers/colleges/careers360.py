@@ -70,6 +70,11 @@ def generate_careers360_url(page):
     encoded_params = urllib.parse.urlencode(query_params, safe=",")
     return f"{base_url}?{encoded_params}"
 
+def generate_course_url(college_url):
+    degrees = "72,14,6,101,150,168,9,184,76,154,215,191,73"
+    return f"{college_url}/courses?degree={degrees}&sort_by=1"
+
+
 def generate_timestamped_filename(prefix="careers360_colleges"):
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
     return f"{PARTIAL_DIR}/{prefix}_{now}.csv"
@@ -83,6 +88,7 @@ async def fetch_main_page(http, page):
         logging.error(f"Error fetching page {page}: {e}")
         return None
 
+
 def parse_main_page(soup):
     if soup is None:
         return []
@@ -91,16 +97,21 @@ def parse_main_page(soup):
     colleges = soup.find_all("div", class_="card_block")
 
     for college in colleges:
-        college_soup = BeautifulSoup(str(college), 'html.parser')
-
         college_data = {
-            "College Name": college_soup.find("h3", class_="college_name").text.strip() if college_soup.find("h3", class_="college_name") else "N/A",
-            "Location": college_soup.find("span", class_="location").text.strip() if college_soup.find("span", class_="location") else "N/A",
-            "Rating": college_soup.find("span", class_="star_text").text.strip() if college_soup.find("span", class_="star_text") else "N/A",
-            "Reviews": college_soup.find("span", class_="review_text").text.strip() if college_soup.find("span", class_="review_text") else "N/A",
-            "NIRF Ranking": college_soup.find("div", class_="ranking_strip").text.strip() if college_soup.find("div", class_="ranking_strip") else "N/A",
-            "College URL": college_soup.find('a', class_='general_text')['href'] if college_soup.find('a', class_='general_text') else "N/A"
+            "College Name": college.find("h3", class_="college_name").text.strip() if college.find("h3", class_="college_name") else "N/A",
+            "Location": college.find("span", class_="location").text.strip() if college.find("span", class_="location") else "N/A",
+            "Rating": college.find("span", class_="star_text").text.strip() if college.find("span", class_="star_text") else "N/A",
+            "Reviews": college.find("span", class_="review_text").text.strip() if college.find("span", class_="review_text") else "N/A",
+            "NIRF Ranking": college.find("div", class_="ranking_strip").text.strip() if college.find("div", class_="ranking_strip") else "N/A",
         }
+
+        # Extract College URL
+        url_tag = college.find("h3", class_="college_name d-md-none")
+        anchor = url_tag.find("a") if url_tag else None
+        college_data["College URL"] = (anchor['href'].strip()
+            if anchor and anchor.has_attr('href')
+            else "N/A"
+        )
 
         local_colleges.append(college_data)
 
@@ -119,7 +130,6 @@ async def scrape_main_pages(start_page, end_page, save_interval=MAIN_SAVE_INTERV
             if i % save_interval == 0 or i == end_page:
                 save_to_csv(PARTIAL_FILENAME)
                 logging.info(f"Partial data saved after scraping page {i}")
-
 def parse_college_detail_page(college):
     options = Options()
     if HEADLESS_MODE:
@@ -133,80 +143,113 @@ def parse_college_detail_page(college):
 
     if college.get("College URL") == "N/A":
         driver.quit()
-        return college
+        return []
 
+    course_data_list = []
     try:
+        # STEP 1: Open the main /courses page for the college
+        base_url = college["College URL"]
+        courses_url = generate_course_url(base_url)
+        # courses_url = base_url + "/courses"
+        # if not courses_url.startswith("http"):
+        #     courses_url = f"https://www.careers360.com{courses_url}"
+
         driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
-        driver.get(college["College URL"])
+        driver.get(courses_url)
         sleep(random.uniform(DETAIL_PAGE_SLEEP_MIN, DETAIL_PAGE_SLEEP_MAX))
 
-        detail_soup = BeautifulSoup(driver.page_source, "html.parser")
+        main_soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        # Course Details
-        title_tag = detail_soup.find("h1")
-        college["Course Title"] = title_tag.text.strip() if title_tag else "N/A"
+        # STEP 2: Extract all course block links
+        course_blocks = main_soup.find_all("div", class_="detail")
+        course_links = []
+        for block in course_blocks:
+            link_tag = block.find("h4").find("a")
+            if link_tag and link_tag.get("href"):
+                course_links.append(link_tag["href"])
 
-        fee_tag = detail_soup.find("div", class_="fee")
-        college["Total Fees"] = fee_tag.text.strip() if fee_tag else "N/A"
+        # STEP 3: Now loop through each course link and scrape course-specific data
+        for course_link in course_links:
+            course = college.copy()  # base college info
 
-        # Course Duration & Mode
-        course_detail_divs = detail_soup.select(".course_detail_para div")
-        for div in course_detail_divs:
-            label = div.find("p")
-            value = div.find("span")
-            if label and value:
-                label_text = label.text.strip().lower()
-                if label_text == "duration":
-                    college["Course Duration"] = value.text.strip()
-                elif label_text == "mode":
-                    college["Course Mode"] = value.text.strip()
+            # Open course detail page
+            full_url = course_link if course_link.startswith("http") else f"https://www.careers360.com{course_link}"
+            print("Opening:", full_url)
+            driver.get(full_url)
+            sleep(random.uniform(DETAIL_PAGE_SLEEP_MIN, DETAIL_PAGE_SLEEP_MAX))
+            detail_soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        college.setdefault("Course Duration", "N/A")
-        college.setdefault("Course Mode", "N/A")
+            # Course Title
+            title_tag = detail_soup.find("h1")
+            course["Course Title"] = title_tag.text.strip() if title_tag else "N/A"
 
-        # Course Description
-        desc_tag = detail_soup.select_one(".list_tick_style p")
-        college["Course Description"] = desc_tag.text.strip() if desc_tag else "N/A"
+            # Total Fees
+            fee_tag = detail_soup.find("div", class_="fee")
+            course["Total Fees"] = fee_tag.text.strip() if fee_tag else "N/A"
 
-        # Eligibility Criteria
-        eligibility_tag = detail_soup.find("div", id="eligiblity")
-        if eligibility_tag:
-            criteria_tag = eligibility_tag.find("div", class_="data_html_blk")
-            college["Eligibility Criteria"] = criteria_tag.text.strip() if criteria_tag else "N/A"
-        else:
-            college["Eligibility Criteria"] = "N/A"
+            # Course Duration and Mode
+            course_detail_divs = detail_soup.select(".course_detail_para div")
+            for div in course_detail_divs:
+                label = div.find("p")
+                value = div.find("span")
+                if label and value:
+                    label_text = label.text.strip().lower()
+                    if label_text == "duration":
+                        course["Course Duration"] = value.text.strip()
+                    elif label_text == "mode":
+                        course["Course Mode"] = value.text.strip()
 
-        # Selection Process / Admission
-        admission_tag = detail_soup.find("div", id="admission_detail")
-        if admission_tag:
-            selection_para = admission_tag.find("div", class_="data_html_blk")
-            college["Selection Process"] = selection_para.text.strip() if selection_para else "N/A"
-        else:
-            college["Selection Process"] = "N/A"
+            course.setdefault("Course Duration", "N/A")
+            course.setdefault("Course Mode", "N/A")
 
-        # Quick Facts Table
-        quick_facts = detail_soup.select(".quick_facts_table td")
-        for td in quick_facts:
-            label_tag = td.select_one(".right_upr")
-            value_tag = td.select_one(".right_btm span")
-            if label_tag and value_tag:
-                label = label_tag.text.strip().lower()
-                value = value_tag.text.strip()
-                if label == "total fees" and (college.get("Total Fees", "N/A") == "N/A"):
-                    college["Total Fees"] = value
-                elif label == "exam":
-                    college["Entrance Exam"] = value
-                elif label == "seats":
-                    college["Total Seats"] = value
+            # Description
+            desc_tag = detail_soup.select_one(".list_tick_style p")
+            course["Course Description"] = desc_tag.text.strip() if desc_tag else "N/A"
 
-        college.setdefault("Entrance Exam", "N/A")
-        college.setdefault("Total Seats", "N/A")
+            # Eligibility
+            eligibility_tag = detail_soup.find("div", id="eligiblity")
+            if eligibility_tag:
+                criteria_tag = eligibility_tag.find("div", class_="data_html_blk")
+                course["Eligibility Criteria"] = criteria_tag.text.strip() if criteria_tag else "N/A"
+            else:
+                course["Eligibility Criteria"] = "N/A"
+
+            # Admission Process
+            admission_tag = detail_soup.find("div", id="admission_detail")
+            if admission_tag:
+                selection_para = admission_tag.find("div", class_="data_html_blk")
+                course["Selection Process"] = selection_para.text.strip() if selection_para else "N/A"
+            else:
+                course["Selection Process"] = "N/A"
+
+            # Quick Facts Table
+            quick_facts = detail_soup.select(".quick_facts_table td")
+            for td in quick_facts:
+                label_tag = td.select_one(".right_upr")
+                value_tag = td.select_one(".right_btm span")
+                if label_tag and value_tag:
+                    label = label_tag.text.strip().lower()
+                    value = value_tag.text.strip()
+                    if label == "total fees" and (course.get("Total Fees", "N/A") == "N/A"):
+                        course["Total Fees"] = value
+                    elif label == "exam":
+                        course["Entrance Exam"] = value
+                    elif label == "seats":
+                        course["Total Seats"] = value
+
+            course.setdefault("Entrance Exam", "N/A")
+            course.setdefault("Total Seats", "N/A")
+
+            # Append this course's data
+            course_data_list.append(course)
 
     except Exception as e:
-        logging.error(f"Error fetching details for {college.get('College Name', 'Unknown College')}: {e}")
+        logging.error(f"Error scraping courses for {college.get('College Name', 'Unknown College')}: {e}")
 
-    driver.quit()
-    return college
+    finally:
+        driver.quit()
+
+    return course_data_list
 
 def scrape_college_details(save_interval=DETAIL_SAVE_INTERVAL):
     global college_list

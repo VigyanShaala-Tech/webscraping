@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # Load the configuration file
     config = load_config()
 
-    scraper = 2  
+    scraper = 1  
 
     if scraper == 1:
         # Use Careers360 Scraper

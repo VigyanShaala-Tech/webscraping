@@ -3,7 +3,7 @@
 # Careers360 Scraper configuration
 careers360_scraper:
   start_page: 1
-  end_page: 5
+  end_page: 2
 
 # Graphy Assignment Scraper configuration
 graphy_assignment_scraper:
