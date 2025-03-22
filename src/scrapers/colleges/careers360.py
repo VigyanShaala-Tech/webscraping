@@ -71,8 +71,21 @@ def generate_careers360_url(page):
     return f"{base_url}?{encoded_params}"
 
 def generate_course_url(college_url):
-    degrees = "72,14,6,101,150,168,9,184,76,154,215,191,73"
+    """
+    Generates a filtered courses page URL for a given college.
+
+    This function appends specific degree filters and sorting parameters
+    to the base college URL to construct the full courses page URL.
+
+    Parameters:
+    - college_url (str): The base URL of the college.
+
+    Returns:
+    - str: The full URL pointing to the filtered courses page for that college.
+    """
+    degrees = "72,14,6,101,150,168,9,184,76,154,215,191,73"  # Degree IDs to filter specific course types
     return f"{college_url}/courses?degree={degrees}&sort_by=1"
+
 
 
 def generate_timestamped_filename(prefix="careers360_colleges"):
