@@ -3,6 +3,7 @@ import os
 import shutil
 import logging
 import time
+from time import sleep
 from datetime import datetime
 from urllib.parse import urljoin
 
@@ -46,7 +47,6 @@ def setup_driver():
     options.add_argument("--headless")
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-    # Hide webdriver
     driver.execute_cdp_cmd(
         "Page.addScriptToEvaluateOnNewDocument",
         {
@@ -76,7 +76,7 @@ def extract_course_links(html):
     return course_info
 
 # ----------------------------
-# Extract Admission Process Function
+# Extract Admission Process
 # ----------------------------
 def extract_admission_process(driver, base_url):
     admission_url = base_url.rstrip('/') + "/admission"
@@ -84,17 +84,14 @@ def extract_admission_process(driver, base_url):
     time.sleep(5)
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-    # Try to find the section containing the admission process
     admission_section = soup.find("section", id="admission_section_admission_process")
     if not admission_section:
         admission_section = soup.find("div", class_="wikiContents")
 
     if admission_section:
-        # Collect all relevant paragraphs
         paragraphs = admission_section.find_all("p")
         para_text = "\n".join(p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True))
 
-        # Optionally extract highlights from table if needed
         table = admission_section.find("table")
         table_text = ""
         if table:
@@ -103,13 +100,12 @@ def extract_admission_process(driver, base_url):
                 row_text = " | ".join(cell.get_text(strip=True) for cell in cells)
                 table_text += row_text + "\n"
 
-        # Combine text and highlights
         combined = para_text.strip()
         if table_text:
             combined += "\n\nADMISSION HIGHLIGHTS:\n" + table_text.strip()
 
         return combined if combined else "N/A"
-    
+
     return "N/A"
 
 # ----------------------------
@@ -120,46 +116,34 @@ def extract_course_details(driver, course_url):
     time.sleep(4)
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
-    # Extract Eligibility
     eligibility = ""
     eligibility_block = soup.find("div", class_="ba258d")
     if eligibility_block:
         eligibility = eligibility_block.get_text(separator=" ", strip=True)
 
-    # Extract Course Highlights
     highlights = ""
     highlight_section = soup.find("div", id=lambda x: x and x.startswith("EdContent_undefined_bip_section_highlights"))
     if highlight_section:
         highlights = highlight_section.get_text(separator=" ", strip=True)
 
-    # Extract What's New
     whats_new = ""
     whats_new_section = soup.find("div", class_="paper-card boxShadow baac")
     if whats_new_section:
         whats_new = whats_new_section.get_text(separator=" ", strip=True)
 
-    # Extract Admission Process using the custom function
     admission_process = extract_admission_process(driver, course_url)
 
     return eligibility, highlights, whats_new, admission_process
 
 # ----------------------------
-# Main Script
+# Main Script with Pagination
 # ----------------------------
 driver = setup_driver()
 
 try:
-    logging.info(f"Loading main page: {MAIN_URL}")
-    driver.get(MAIN_URL)
-    WebDriverWait(driver, 20).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "section[id^='tupleInstId_']"))
-    )
-    soup = BeautifulSoup(driver.page_source, "html.parser")
-    ranking_items = soup.find_all("section", id=lambda x: x and x.startswith("tupleInstId_"))
-    total = len(ranking_items)
-    logging.info(f"Found {total} colleges")
+    page_no = 1
+    college_index = 1
 
-    # Write CSV header
     with open(OUTPUT_FILE, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -170,53 +154,78 @@ try:
     with open(OUTPUT_FILE, mode="a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
 
-        for idx, item in enumerate(ranking_items, start=1):
-            name_tag = item.select_one("a.rank_clg h4")
-            college_name = name_tag.text.strip() if name_tag else "N/A"
+        while True:
+            page_url = f"{MAIN_URL}?pageNo={page_no}"
+            logging.info(f"Loading Page {page_no}: {page_url}")
+            driver.get(page_url)
 
-            rank_tag = item.select_one(".rank_section span.circleText")
-            rank = rank_tag.text.strip() if rank_tag else "N/A"
+            try:
+                WebDriverWait(driver, 20).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "section[id^='tupleInstId_']"))
+                )
+            except:
+                logging.warning("No content found or page load timeout.")
+                break
 
-            fee_label = item.find(lambda tag: tag.name == "div" and tag.get_text(strip=True).startswith("Fees:"))
-            base_fees = fee_label.find_next("div").text.strip() if fee_label else "N/A"
+            soup = BeautifulSoup(driver.page_source, "html.parser")
+            ranking_items = soup.find_all("section", id=lambda x: x and x.startswith("tupleInstId_"))
 
-            salary_label = item.find(lambda tag: tag.name == "div" and tag.get_text(strip=True).startswith("Salary :"))
-            avg_salary = salary_label.find_next("div").text.strip() if salary_label else "N/A"
+            if not ranking_items:
+                logging.info("No more ranking items found. Pagination complete.")
+                break
 
-            course_link = item.find("a", href=True, string="Courses")
-            course_url = urljoin("https://www.shiksha.com", course_link["href"]) if course_link else None
+            logging.info(f"Found {len(ranking_items)} colleges on page {page_no}")
 
-            logging.info(f"[{idx}/{total}] {college_name} (Rank {rank}) → {course_url or 'no course page'}")
+            for item in ranking_items:
+                name_tag = item.select_one("a.rank_clg h4")
+                college_name = name_tag.text.strip() if name_tag else "N/A"
 
-            if course_url:
-                try:
-                    driver.get(course_url)
-                    time.sleep(6)
-                    course_page_html = driver.page_source
-                    courses = extract_course_links(course_page_html)
+                rank_tag = item.select_one(".rank_section span.circleText")
+                rank = rank_tag.text.strip() if rank_tag else "N/A"
 
-                    for course_name, course_href in courses:
-                        try:
-                            # Extract eligibility, highlights, what's new, and admission process for each course
-                            eligibility, highlights, whats_new, admission_process = extract_course_details(driver, course_href)
-                            writer.writerow([
-                                rank, college_name, base_fees, avg_salary, course_url,
-                                course_name, course_href, eligibility, highlights, whats_new, admission_process
-                            ])
-                        except Exception as e:
-                            logging.warning(f"Failed course detail extraction for {course_href}: {e}")
+                fee_label = item.find(lambda tag: tag.name == "div" and tag.get_text(strip=True).startswith("Fees:"))
+                base_fees = fee_label.find_next("div").text.strip() if fee_label else "N/A"
 
-                except Exception as e:
-                    logging.warning(f"Error scraping course links: {e}")
+                salary_label = item.find(lambda tag: tag.name == "div" and tag.get_text(strip=True).startswith("Salary :"))
+                avg_salary = salary_label.find_next("div").text.strip() if salary_label else "N/A"
 
-            csvfile.flush()
-            os.fsync(csvfile.fileno())
+                course_link = item.find("a", href=True, string="Courses")
+                course_url = urljoin("https://www.shiksha.com", course_link["href"]) if course_link else None
 
-            if idx % BACKUP_EVERY == 0:
-                ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-                backup_name = f"backup_{idx}_{ts}.csv"
-                shutil.copy(OUTPUT_FILE, backup_name)
-                logging.info(f"  → backup saved: {backup_name}")
+                logging.info(f"[{college_index}] {college_name} (Rank {rank}) → {course_url or 'no course page'}")
+
+                if course_url:
+                    try:
+                        driver.get(course_url)
+                        time.sleep(6)
+                        course_page_html = driver.page_source
+                        courses = extract_course_links(course_page_html)
+
+                        for course_name, course_href in courses:
+                            try:
+                                eligibility, highlights, whats_new, admission_process = extract_course_details(driver, course_href)
+                                writer.writerow([
+                                    rank, college_name, base_fees, avg_salary, course_url,
+                                    course_name, course_href, eligibility, highlights, whats_new, admission_process
+                                ])
+                            except Exception as e:
+                                logging.warning(f"Failed course detail extraction for {course_href}: {e}")
+
+                    except Exception as e:
+                        logging.warning(f"Error scraping course links: {e}")
+
+                csvfile.flush()
+                os.fsync(csvfile.fileno())
+
+                if college_index % BACKUP_EVERY == 0:
+                    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    backup_name = f"backup_{college_index}_{ts}.csv"
+                    shutil.copy(OUTPUT_FILE, backup_name)
+                    logging.info(f"  → backup saved: {backup_name}")
+
+                college_index += 1
+
+            page_no += 1
 
     logging.info("Finished! Full data saved to " + OUTPUT_FILE)
 
