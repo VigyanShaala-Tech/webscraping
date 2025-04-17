@@ -47,7 +47,6 @@ def setup_driver():
     options.add_argument("--headless")
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-    # Hide webdriver
     driver.execute_cdp_cmd(
         "Page.addScriptToEvaluateOnNewDocument",
         {
@@ -77,6 +76,48 @@ def extract_course_links(html):
     return course_info
 
 # ----------------------------
+# Extract Course Details Function
+# ----------------------------
+def extract_course_details(driver, course_url):
+    details = {
+        "Eligibility Exams": "",
+        "10+2 Score": "",
+        "Overview": "",
+        "Fees": ""
+    }
+
+    try:
+        driver.get(course_url)
+        time.sleep(5)
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+
+        eligibility_section = soup.find("div", class_="ba258d")
+        if eligibility_section:
+            exams = eligibility_section.find_all("a", class_="aace")
+            if exams:
+                details["Eligibility Exams"] = ", ".join([exam.text for exam in exams])
+
+            score_tag = eligibility_section.find("span", string="10+2 score")
+            if score_tag:
+                score_value = score_tag.find_next("span", class_="_850322")
+                details["10+2 Score"] = score_value.text.strip() if score_value else ""
+
+        overview_div = soup.find("div", id=lambda x: x and "highlights" in x)
+        if overview_div:
+            overview_paragraphs = overview_div.find_all("p")
+            overview_text = " ".join(p.get_text(" ", strip=True) for p in overview_paragraphs)
+            details["Overview"] = overview_text.strip()
+
+            fee_keywords = ["fee", "Fee", "INR", "₹"]
+            fees_text = [p.get_text(" ", strip=True) for p in overview_paragraphs if any(k in p.text for k in fee_keywords)]
+            details["Fees"] = " ".join(fees_text).strip()
+
+    except Exception as e:
+        logging.warning(f"Failed to extract details from course page {course_url}: {e}")
+
+    return details
+
+# ----------------------------
 # Main Script
 # ----------------------------
 driver = setup_driver()
@@ -92,10 +133,12 @@ try:
     total = len(ranking_items)
     logging.info(f"Found {total} colleges")
 
-    # Write CSV header
     with open(OUTPUT_FILE, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["Rank", "College Name", "Base Fees", "Avg Salary", "College Page URL", "Course Name", "Course URL"])
+        writer.writerow([
+            "Rank", "College Name", "Base Fees", "Avg Salary", "College Page URL",
+            "Course Name", "Course URL", "Eligibility Exams", "10+2 Score", "Fees", "Course Overview"
+        ])
 
     with open(OUTPUT_FILE, mode="a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
@@ -126,7 +169,15 @@ try:
                     courses = extract_course_links(course_page_html)
 
                     for course_name, course_href in courses:
-                        writer.writerow([rank, college_name, base_fees, avg_salary, course_url, course_name, course_href])
+                        course_details = extract_course_details(driver, course_href)
+                        writer.writerow([
+                            rank, college_name, base_fees, avg_salary, course_url,
+                            course_name, course_href,
+                            course_details["Eligibility Exams"],
+                            course_details["10+2 Score"],
+                            course_details["Fees"],
+                            course_details["Overview"]
+                        ])
                 except Exception as e:
                     logging.warning(f"Error scraping course links: {e}")
 
