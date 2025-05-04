@@ -10,3 +10,8 @@ graphy_assignment_scraper:
   email: "your_email@example.com"
   password: "your_password"
   assignment_id: "65c5f301e4b051b50cfd6121"
+
+# Shiksha Scraper configuration
+shiksha_scraper:
+  start_page: 1
+  end_page: 2

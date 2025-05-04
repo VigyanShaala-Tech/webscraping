@@ -1,6 +1,5 @@
 import csv
 import os
-import shutil
 import logging
 import time
 from time import sleep
@@ -20,7 +19,6 @@ from bs4 import BeautifulSoup
 # CONFIG
 # ----------------------------
 MAIN_URL = "https://www.shiksha.com/engineering/ranking/top-engineering-colleges-in-india/44-2-0-0-0"
-OUTPUT_FILE = "engineering_colleges_and_courses.csv"
 BACKUP_EVERY = 5
 
 # ----------------------------
@@ -136,25 +134,39 @@ def extract_course_details(driver, course_url):
     return eligibility, highlights, whats_new, admission_process
 
 # ----------------------------
-# Main Script with Pagination
+# Save to CSV
 # ----------------------------
-driver = setup_driver()
+def save_to_csv(filename, data, header):
+    try:
+        with open(filename, mode="w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            writer.writerows(data)
+        logging.info(f"Data saved to {filename}")
+    except Exception as e:
+        logging.error(f"Error saving CSV: {e}")
 
-try:
-    page_no = 1
-    college_index = 1
+# ----------------------------
+# Main Function
+# ----------------------------
+def main(start_page=1, end_page=2):
+    PARTIAL_DIR = "output/colleges/shiksha"
+    LOG_FILE = "logs/shiksha_scraper.log"
+    PARTIAL_FILENAME = f"{PARTIAL_DIR}/shiksha_colleges_partial.csv"
+    os.makedirs("logs", exist_ok=True)
+    os.makedirs(PARTIAL_DIR, exist_ok=True)
 
-    with open(OUTPUT_FILE, mode="w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            "Rank", "College Name", "Base Fees", "Avg Salary", "College Page URL",
-            "Course Name", "Course URL", "Eligibility Criteria", "Course Highlights", "What's New", "Admission Process"
-        ])
+    header = [
+        "Rank", "College Name", "Base Fees", "Avg Salary", "College Page URL",
+        "Course Name", "Course URL", "Eligibility Criteria", "Course Highlights", "What's New", "Admission Process"
+    ]
+    all_data = []
+    driver = setup_driver()
+    try:
+        page_no = start_page
+        college_index = 1
 
-    with open(OUTPUT_FILE, mode="a", newline="", encoding="utf-8") as csvfile:
-        writer = csv.writer(csvfile)
-
-        while True:
+        while page_no <= end_page:
             page_url = f"{MAIN_URL}?pageNo={page_no}"
             logging.info(f"Loading Page {page_no}: {page_url}")
             driver.get(page_url)
@@ -192,7 +204,7 @@ try:
                 course_link = item.find("a", href=True, string="Courses")
                 course_url = urljoin("https://www.shiksha.com", course_link["href"]) if course_link else None
 
-                logging.info(f"[{college_index}] {college_name} (Rank {rank}) → {course_url or 'no course page'}")
+                logging.info(f"[{college_index}] {college_name} (Rank {rank}) -> {course_url or 'no course page'}")
 
                 if course_url:
                     try:
@@ -204,7 +216,7 @@ try:
                         for course_name, course_href in courses:
                             try:
                                 eligibility, highlights, whats_new, admission_process = extract_course_details(driver, course_href)
-                                writer.writerow([
+                                all_data.append([
                                     rank, college_name, base_fees, avg_salary, course_url,
                                     course_name, course_href, eligibility, highlights, whats_new, admission_process
                                 ])
@@ -214,20 +226,24 @@ try:
                     except Exception as e:
                         logging.warning(f"Error scraping course links: {e}")
 
-                csvfile.flush()
-                os.fsync(csvfile.fileno())
-
+                # Backup
                 if college_index % BACKUP_EVERY == 0:
-                    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    backup_name = f"backup_{college_index}_{ts}.csv"
-                    shutil.copy(OUTPUT_FILE, backup_name)
-                    logging.info(f"  → backup saved: {backup_name}")
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    backup_file = f"{PARTIAL_DIR}/shiksha_backup_{college_index}_{timestamp}.csv"
+                    save_to_csv(backup_file, all_data, header)
+                    logging.info(f"Backup saved to {backup_file} at college index {college_index}")
+
+                # Save latest progress to a consistent partial file
+                save_to_csv(PARTIAL_FILENAME, all_data, header)
 
                 college_index += 1
 
             page_no += 1
 
-    logging.info("Finished! Full data saved to " + OUTPUT_FILE)
+        # Final save
+        final_filename = f"{PARTIAL_DIR}/shiksha_colleges_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        save_to_csv(final_filename, all_data, header)
+        logging.info(f"Final data saved to {final_filename}")
 
-finally:
-    driver.quit()
+    finally:
+        driver.quit()
